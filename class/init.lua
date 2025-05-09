@@ -145,6 +145,30 @@ end)
 
 local Object = Class()
 
+function M.def_class(class_definition)
+    if type(class_definition) ~= "table" then
+        error("class_definition must be a table")
+    end
+    local class
+    if class_definition.super then
+        class = class_definition.super:subclass()
+    else
+        class = Object:subclass()
+    end
+    if class_definition.static then
+        for k, v in pairs(class_definition.static) do
+            class.class:set_method(k, v)
+        end
+    end
+    
+    if class_definition.methods then
+        for k, v in pairs(class_definition.methods) do
+            class:set_method(k, v)
+        end
+    end
+    return class
+end
+
 function M:setup()
 end
 
