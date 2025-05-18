@@ -160,7 +160,7 @@ function M.def_class(class_definition)
             if type(v) == "function" then
                 class.class:set_method(k, v)
             else
-                class.class[k] = v
+                class[k] = v
             end
         end
     end
