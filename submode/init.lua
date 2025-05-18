@@ -16,7 +16,7 @@ local class_submode = class.def_class
             self.ID = self.ID + 1
             return self.SID .. self.ID .. "_"
         end,
-    }
+    },
     methods = {
         initialize = function(self, name, enter_cmd, modes)
             self.name = name
