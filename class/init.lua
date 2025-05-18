@@ -157,7 +157,11 @@ function M.def_class(class_definition)
     end
     if class_definition.static then
         for k, v in pairs(class_definition.static) do
-            class.class:set_method(k, v)
+            if type(v) == "function" then
+                class.class:set_method(k, v)
+            else
+                class.class[k] = v
+            end
         end
     end
     
