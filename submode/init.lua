@@ -25,24 +25,54 @@ local class_submode = class.def_class
             vim.keymap.set(modes, enter_cmd, function()
                 vim.opt.timeout = false
                 vim.notify("-- " .. name .. " --")
-                return self.id .. name
-            end, { script = true, noremap = true, nowait = true, expr = true })
-            vim.keymap.set(modes, self.id .. name, self:get_leave_submode_with_cmd(""), { noremap = true, expr = true })
+                return self.id
+            end, { script = true, noremap = true, nowait = true, expr = true, silent = true })
+            vim.keymap.set(modes, self.id, self:get_leave_submode_with_cmd(""), { noremap = true, expr = true })
         end,
         add_command = function(self, lhs, rhs, opts)
             if not opts then
                 opts = {}
             end
-            if not opts.expr then
+            if opts.continue || opts.leave == false then
+                rhs = self:get_continue_submode_after_cmd(rhs)
+            else
+                rhs = self:get_leave_submode_with_cmd(rhs)
+            end
+            if type(rhs) == "function" && not opts.expr then
                 opts.expr = true
             end
-            vim.keymap.set(self.modes, self.id .. self.name .. lhs, self:get_leave_submode_with_cmd(rhs), opts)
+            vim.keymap.set(self.modes, self.id .. lhs, rhs, opts)
         end,
         get_leave_submode_with_cmd = function(self, cmd)
-            return function()
-                vim.opt.timeout = true
-                vim.notify(" ")
-                return cmd
+            if type(cmd) == "function" then
+                return function()
+                    vim.opt.timeout = true
+                    vim.notify(" ")
+                    local ret_cmd = cmd()
+                    if type(ret_cmd) == "string" then
+                        return ret_cmd
+                    end
+                end
+            else
+                return function()
+                    vim.opt.timeout = true
+                    vim.notify(" ")
+                    return cmd
+                end
+            end
+        end,
+        get_continue_submode_after_cmd = function(self, cmd)
+            if type(cmd) == "function" then
+                return function()
+                    local ret_cmd = cmd()
+                    if type(ret_cmd) == "string" then
+                        return ret_cmd .. self.id
+                    else
+                        return self.id
+                    end
+                end
+            else
+                return cmd .. self.id
             end
         end,
     }
