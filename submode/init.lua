@@ -33,12 +33,12 @@ local class_submode = class.def_class
             if not opts then
                 opts = {}
             end
-            if opts.continue || opts.leave == false then
+            if opts.continue or opts.leave == false then
                 rhs = self:get_continue_submode_after_cmd(rhs)
             else
                 rhs = self:get_leave_submode_with_cmd(rhs)
             end
-            if type(rhs) == "function" && not opts.expr then
+            if type(rhs) == "function" and not opts.expr then
                 opts.expr = true
             end
             vim.keymap.set(self.modes, self.id .. lhs, rhs, opts)
